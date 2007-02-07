@@ -175,7 +175,7 @@ vennSelectBM <- function (eset, design, x, contrast, fit, method = "same", adj.m
 
   ## check to see if the ann.source is available
 
-  if(!ann.source %in% listFilters(mart)){
+  if(!ann.source %in% listFilters(mart)[,1]){
     cat(paste("Error: '", ann.source, "'is not an available annotation source for",
               "this biomaRt or this species.\nAvailable choices are listed below:\n"))
     return(listFilters(mart))
@@ -239,10 +239,10 @@ vennSelectBM <- function (eset, design, x, contrast, fit, method = "same", adj.m
       table.head <- c(links$names, otherdata$names)
       if(!is.null(stats)){
         nam <- c(nam, stats$out)
-        nam$expression <- round(exprs(eset[,cols[[i]]])[tmp[stats$ord],], 3)
+        nam$expression <- round(exprs(eset[,cols[[i]]])[tmp[stats$ord], , drop = FALSE], 3)
         table.head <- c(table.head, names(stats$out))
       }else{
-        nam$expression <- round(exprs(eset[,cols[[i]]])[tmp,], 3)
+        nam$expression <- round(exprs(eset[,cols[[i]]])[tmp, , drop = FALSE], 3)
       }
       if(html)
         htmlpage(lnks, paste(name[i], "html", sep="."), name[i], nam,
@@ -267,9 +267,11 @@ limma2biomaRt <- function (eset, fit, design, contrast, species, links = linksBM
 
   
   if(!interactive){
-    limma2biomaRt.na(eset, fit, design, contrast, species, links, otherdata, ann.source,
-                     adjust, number, pfilt, fldfilt, tstat, pval, FC, expression,
-                     html, save, addname, affyid, mysql)
+    limma2biomaRt.na(eset=eset, fit=fit, design=design, contrast=contrast, species=species,
+                     links=links, otherdata=otherdata, ann.source=ann.source,
+                     adjust=adjust, number=number, pfilt=pfilt, fldfilt=fldfilt,
+                     tstat=tstat, pval=pval, FC=FC, expression=expression,
+                     html=html, save=save, addname=addname, affyid=affyid, mysql=mysql)
   }else{
     require(biomaRt, quietly = TRUE)
     mart <- useMart("ensembl", dataset = paste(species, "_gene_ensembl", sep=""),
@@ -277,7 +279,7 @@ limma2biomaRt <- function (eset, fit, design, contrast, species, links = linksBM
 
     ## check to see if ann.source is available
 
-    if(!ann.source %in% listFilters(mart)){
+    if(!ann.source %in% listFilters(mart)[,1]){
       cat(paste("Error: '", ann.source, "'is not an available annotation source for",
                 "this biomaRt or this species.\nAvailable choices are listed below:\n"))
       return(listFilters(mart))
@@ -382,7 +384,7 @@ limma2biomaRt <- function (eset, fit, design, contrast, species, links = linksBM
           testtable$fold.change <- round(fld,2)
         }
         if (expression) 
-          testtable$expression <- round(exprs(eset[, grps])[probeids,], 3)
+          testtable$expression <- round(exprs(eset[, grps])[probeids, , drop = FALSE], 3)
       }
       table.head <- c(links$names, otherdata$names,
                       c("t-statistic","p-value","Fold change")[c(tstat, pval, FC)],
@@ -414,7 +416,7 @@ limma2biomaRt.na <- function (eset, fit, design, contrast, species, links = link
 
   ## check to see if ann.source is available
 
-  if(!ann.source %in% listFilters(mart)){
+  if(!ann.source %in% listFilters(mart)[,1]){
     cat(paste("Error: '", ann.source, "'is not an available annotation source for",
               "this biomaRt or this species.\nAvailable choices are listed below:\n"))
     return(listFilters(mart))
@@ -489,7 +491,7 @@ limma2biomaRt.na <- function (eset, fit, design, contrast, species, links = link
         testtable$fold.change <- round(fld,2)
       }
       if (expression) 
-        testtable$expression <- round(exprs(eset[, grps])[probeids,], 3)
+        testtable$expression <- round(exprs(eset[, grps])[probeids, , drop = FALSE], 3)
     }
     table.head <- c(links$names, otherdata$names,
                     c("t-statistic","p-value","Fold change")[c(tstat, pval, FC)],
@@ -515,7 +517,7 @@ probes2tableBM <- function(eset, probids, species, filename, otherdata = NULL,
   
   ## check to see if ann.source is available
   
-  if(!ann.source %in% listFilters(mart)){
+  if(!ann.source %in% listFilters(mart)[,1]){
     cat(paste("Error: '", ann.source, "'is not an available annotation source for",
               "this biomaRt or this species.\nAvailable choices are listed below:\n"))
     return(listFilters(mart))
@@ -546,7 +548,7 @@ probes2tableBM <- function(eset, probids, species, filename, otherdata = NULL,
   if(!is.null(otherdata))
     testtable <- c(testtable, otherdata)
   if(express)
-    testtable <- c(testtable, as.data.frame(round(exprs(eset)[probids,], 2)))
+    testtable <- c(testtable, as.data.frame(round(exprs(eset)[probids, , drop = FALSE], 2)))
   if(html)
     htmlpage(anntable, paste(filename, "html", sep = "."), filename, testtable,
              table.head, repository = as.list(links$repository))
