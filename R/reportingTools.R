@@ -635,6 +635,7 @@ venn4Way <- function(fit, contrast,  p.value, lfc, adj.meth, baseUrl = ".", repo
 ##' then an extraname can be appended to ensure uniqueness.
 ##' @param weights Array weights, generally from \code{arrayWeights} in the limma package. These will affect the size
 ##' of the plotting symbols, to reflect the relative importance of each sample.
+##' @param insert.after Which column should the image be inserted after? Defaults to 3.
 ##' @param \dots Allows arbitrary arguments to be passed down to lower level functions.
 ##' @return A list, two items. The first item is the input data.frame with the glyphs included, ready to be used with
 ##' ReportingTools to create an HTML table. The second item is a pdf of the most differentially expressed comparison. This is
@@ -642,7 +643,8 @@ venn4Way <- function(fit, contrast,  p.value, lfc, adj.meth, baseUrl = ".", repo
 ##' in the document to show clients what to expect.
 ##' @author James W. MacDonald \email{jmacdon@@u.washington.edu}
 ##' @export makeImages
-makeImages <- function(df, eset, grp.factor, design, contrast, colind, boxplot = FALSE, repdir = "./reports", extraname = NULL, weights = NULL, ...){
+makeImages <- function(df, eset, grp.factor, design, contrast, colind, boxplot = FALSE, repdir = "./reports", extraname = NULL, weights = NULL,
+                       insert.after = 3, ...){
     ## check that this is going to work
     eclass <- class(eset)[1]
     addtrailingslash <- function(path){
@@ -677,8 +679,8 @@ makeImages <- function(df, eset, grp.factor, design, contrast, colind, boxplot =
                                                    rownames(df), "png", sep = "."))
     pdf.image <- file.path(figure.directory, paste("boxplot", 
                                                   rownames(df), "pdf", sep = "."))
-    df <- data.frame(df[,1:3], Image = hwriteImage(mini.image, link = pdf.image, table = FALSE),
-                     df[,4:ncol(df)])
+    df <- data.frame(df[,1:insert.after, drop = FALSE], Image = hwriteImage(mini.image, link = pdf.image, table = FALSE),
+                     df[,(insert.after + 1):ncol(df), drop = FALSE])
     return(list(df = df, top.pdf = pdf.image[1]))
 }
 
