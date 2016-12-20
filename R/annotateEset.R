@@ -124,7 +124,7 @@ setMethod("annotateEset", c("ExpressionSet","AffyExpressionPDInfo"),
     anno <- switch(type,
                    core = as.data.frame(do.call(rbind, lapply(strsplit(annot$geneassignment, " // "), "[", 1:3))),
                    probeset = as.data.frame(do.call(rbind, lapply(strsplit(annot$geneassignment, " /// "), function(x) unlist(strsplit(x[1], " // "))))))
-    names(anno) <- c("ID", "SYMBOL","GENENAME")[seq_len(ncol(anno))]
+    names(anno) <- c("ID", "SYMBOL","GENENAME","CHRLOC","ENTREZID")[seq_len(ncol(anno))]
     row.names(anno) <- switch(type,
                               probeset = as.character(annot$probesetid),
                               core = as.character(annot$transcriptclusterid))
